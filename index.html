@@ -1,265 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Application Preview</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0e1621;
-      color: #e8edf2;
-      padding: 16px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #1c2733;
-    }
-    .header h1 { font-size: 1.3rem; font-weight: 600; }
-    .header .company { font-size: 1.1rem; color: #64b5f6; margin-top: 4px; }
-    .header .role { font-size: 0.95rem; color: #9aa7b4; margin-top: 2px; }
-    .header .status {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: #1b3a1b;
-      color: #4caf50;
-    }
-    .section {
-      background: #17212b;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #64b5f6;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-    .field {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 8px 0;
-      border-bottom: 1px solid #1c2733;
-    }
-    .field:last-child { border-bottom: none; }
-    .field-label {
-      font-size: 0.85rem;
-      color: #9aa7b4;
-      flex-shrink: 0;
-      margin-right: 12px;
-      min-width: 120px;
-    }
-    .field-value {
-      font-size: 0.9rem;
-      color: #e8edf2;
-      text-align: right;
-      word-break: break-word;
-      font-weight: 500;
-    }
-    .field-value.missing {
-      color: #f44336;
-      font-style: italic;
-    }
-    .field-value.redacted {
-      color: #ff9800;
-    }
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      padding-bottom: 30px;
-    }
-    .btn {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-    }
-    .btn-approve {
-      background: #2e7d32;
-      color: white;
-    }
-    .btn-reject {
-      background: #c62828;
-      color: white;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.75rem;
-      color: #5d7280;
-      margin-top: 16px;
-      padding-bottom: 20px;
-    }
-    .resume-link {
-      display: inline-block;
-      color: #64b5f6;
-      text-decoration: none;
-      font-size: 0.85rem;
-    }
-    .resume-link:visited { color: #64b5f6; }
-    .generated-at {
-      font-size: 0.75rem;
-      color: #5d7280;
-      margin-top: 4px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>📋 Application Preview</h1>
-    <div class="company" id="company">—</div>
-    <div class="role" id="role">—</div>
-    <div class="status" id="status">PRE-SUBMIT REVIEW</div>
-  </div>
-  <div id="content"></div>
-  <div class="footer" id="footer"></div>
-
-  <script>
-    const APP_DATA = {
-  "company": "HumanIT Digital Consulting",
-  "role": "Senior AI Engineer (Java/LangChain)",
-  "location": "Portugal — Full Remote",
-  "job_url": "https://www.careers-page.com/humanit/job/V6Y55X8R/apply",
-  "pipeline_id": "humanit-senior-ai-engineer-java-2026-07-10",
-  "fields": {
-    "full_name": "Harlley Oliveira",
-    "email": "harlley@gmail.com",
-    "phone": "+351936991351",
-    "location": "Braga, Portugal",
-    "linkedin": "https://linkedin.com/in/harlley",
-    "github": "https://github.com/harlley",
-    "nationality": "Brazilian",
-    "second_language": "Portuguese",
-    "english_level": "C2 (Proficient)",
-    "current_employer": "Snorkel AI (via Acuity)",
-    "current_job_title": "Applied AI Engineer",
-    "years_of_experience": "10+ year",
-    "tech_stack": "Python",
-    "work_model": "Full-Remote",
-    "salary_expectation": "75000 EUR/year"
-  },
-  "consents": {
-    "gdpr": true,
-    "terms": true
-  },
-  "resume_filename": "Harlley_Oliveira_Resume_Applied_AI_Engineer.pdf",
-  "generated_at": "2026-07-12 13:57 UTC"
-};
-    const APP_DATA = {};
-
-    function escapeHtml(s) {
-      if (s === null || s === undefined) return '';
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    function formatValue(v) {
-      if (v === null || v === undefined || v === '') {
-        return { text: '— missing —', cls: 'missing' };
-      }
-      if (typeof v === 'object') {
-        return { text: escapeHtml(Object.entries(v).map(([k,v2]) => `${k}: ${v2}`).join('; ')), cls: '' };
-      }
-      const sv = String(v);
-      // Detect phone-like values for redaction display
-      if (/^\+?\d{6,}/.test(sv) && sv.length > 8) {
-        return { text: escapeHtml(sv.slice(0,4) + '•••••' + sv.slice(-4)), cls: 'redacted' };
-      }
-      return { text: escapeHtml(sv), cls: '' };
-    }
-
-    function renderSection(title, fields) {
-      let html = `<div class="section"><div class="section-title">${escapeHtml(title)}</div>`;
-      for (const [label, value] of fields) {
-        const fv = formatValue(value);
-        html += `<div class="field"><span class="field-label">${escapeHtml(label)}</span><span class="field-value ${fv.cls}">${fv.text}</span></div>`;
-      }
-      html += '</div>';
-      return html;
-    }
-
-    function render() {
-      document.getElementById('company').textContent = APP_DATA.company || '—';
-      document.getElementById('role').textContent = APP_DATA.role || '—';
-
-      const content = document.getElementById('content');
-      let html = '';
-
-      // Job info
-      html += renderSection('Position', [
-        ['Company', APP_DATA.company],
-        ['Role', APP_DATA.role],
-        ['Location', APP_DATA.location],
-        ['Job URL', APP_DATA.job_url],
-        ['Pipeline ID', APP_DATA.pipeline_id],
-      ]);
-
-      // Personal info
-      html += renderSection('Applicant', [
-        ['Full Name', APP_DATA.fields?.full_name],
-        ['Email', APP_DATA.fields?.email],
-        ['Phone', APP_DATA.fields?.phone],
-        ['Location', APP_DATA.fields?.location],
-        ['LinkedIn', APP_DATA.fields?.linkedin],
-        ['GitHub', APP_DATA.fields?.github],
-      ]);
-
-      // Application fields
-      const appFields = APP_DATA.fields || {};
-      const knownKeys = new Set(['full_name','email','phone','location','linkedin','github']);
-      const extraFields = Object.entries(appFields).filter(([k]) => !knownKeys.has(k));
-      if (extraFields.length > 0) {
-        html += renderSection('Application Answers', extraFields);
-      }
-
-      // Resume
-      html += renderSection('Documents', [
-        ['Resume', APP_DATA.resume_filename || 'Harlley_Oliveira_Resume_Applied_AI_Engineer.pdf'],
-      ]);
-
-      // Consents
-      html += renderSection('Consents', [
-        ['GDPR Consent', APP_DATA.consents?.gdpr ? '✅ Checked' : '❌ Unchecked'],
-        ['Terms & Privacy', APP_DATA.consents?.terms ? '✅ Checked' : '❌ Unchecked'],
-      ]);
-
-      // Timestamps
-      html += renderSection('Meta', [
-        ['Generated at', APP_DATA.generated_at],
-      ]);
-
-      content.innerHTML = html;
-
-      // Footer with instructions
-      document.getElementById('footer').innerHTML = `
-        Review the data above.<br>
-        Reply <b>"submit"</b> to approve or <b>"change &lt;field&gt;"</b> to request changes.<br>
-        <span class="generated-at">Generated: ${escapeHtml(APP_DATA.generated_at || 'unknown')}</span>
-      `;
-    }
-
-    render();
-  </script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Application Preview</title><style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0e1621;color:#e8edf2;padding:16px;max-width:600px;margin:0 auto}
+.h{text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #1c2733}
+.h h1{font-size:1.3rem;font-weight:600}.h .c{font-size:1.1rem;color:#64b5f6;margin-top:4px}
+.h .r{font-size:.95rem;color:#9aa7b4;margin-top:2px}
+.h .s{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:12px;font-size:.8rem;font-weight:600;background:#1b3a1b;color:#4caf50}
+.f{display:flex;flex-direction:column;gap:1px;background:#1c2733;border-radius:12px;overflow:hidden}
+.row{display:flex;flex-direction:column;background:#17212b;padding:12px 16px}
+.lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:#64b5f6;margin-bottom:4px;font-weight:600}
+.val{font-size:.95rem;word-break:break-word;font-weight:500}
+.val.m{color:#f44336;font-style:italic}
+.ft{text-align:center;font-size:.8rem;color:#5d7280;margin-top:20px;padding-bottom:30px}
+.ft b{color:#9aa7b4}</style></head><body>
+<div class="h"><h1>📋 Application Preview</h1>
+<div class="c">HumanIT Digital Consulting</div>
+<div class="r">Senior AI Engineer (Java/LangChain)</div>
+<div class="s">PRE-SUBMIT REVIEW</div></div>
+<div class="f"><div class="row"><span class="lbl">Full Name</span><span class="val">Harlley Oliveira</span></div>
+<div class="row"><span class="lbl">Email</span><span class="val">harlley@gmail.com</span></div>
+<div class="row"><span class="lbl">Phone</span><span class="val">+351 936 991 351</span></div>
+<div class="row"><span class="lbl">Location</span><span class="val">Braga, Portugal</span></div>
+<div class="row"><span class="lbl">LinkedIn</span><span class="val">https://linkedin.com/in/harlley</span></div>
+<div class="row"><span class="lbl">GitHub</span><span class="val">https://github.com/harlley</span></div>
+<div class="row"><span class="lbl">Nationality</span><span class="val">Brazilian</span></div>
+<div class="row"><span class="lbl">Second Language</span><span class="val">Portuguese</span></div>
+<div class="row"><span class="lbl">English Level</span><span class="val">C2 (Proficient)</span></div>
+<div class="row"><span class="lbl">Current Employer</span><span class="val">Snorkel AI (via Acuity)</span></div>
+<div class="row"><span class="lbl">Current Job Title</span><span class="val">Applied AI Engineer</span></div>
+<div class="row"><span class="lbl">Years of Experience</span><span class="val">10+ year</span></div>
+<div class="row"><span class="lbl">Tech Stack</span><span class="val">Python</span></div>
+<div class="row"><span class="lbl">Work Model</span><span class="val">Full-Remote</span></div>
+<div class="row"><span class="lbl">Salary Expectation</span><span class="val">75000 EUR/year</span></div>
+<div class="row"><span class="lbl">Resume</span><span class="val">Harlley_Oliveira_Resume_Applied_AI_Engineer.pdf</span></div>
+<div class="row"><span class="lbl">GDPR Consent</span><span class="val">✅ Checked</span></div>
+<div class="row"><span class="lbl">Terms &amp; Privacy</span><span class="val">✅ Checked</span></div>
+</div>
+<div class="ft">Reply <b>"submit"</b> to approve or <b>"change &lt;field&gt;"</b> to request changes.<br>
+Generated: 2026-07-12 14:05 UTC</div>
+</body></html>
